@@ -1,0 +1,48 @@
+plugins {
+    id 'org.springframework.boot' version '2.4.1'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+}
+
+group = 'com.neocode24'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Mongodb
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // prometheus
+    implementation('io.micrometer:micrometer-registry-prometheus')
+
+    // org.jasypt/jasypt
+    compile('org.jasypt:jasypt:1.9.2')
+
+    // jasypt
+    compile('com.github.ulisesbocchio:jasypt-spring-boot:2.1.0')
+
+    // QR code
+    compile 'com.google.zxing:core:3.3.0'
+    compile 'com.google.zxing:javase:3.3.0'
+}
+
+test {
+    useJUnitPlatform()
+}

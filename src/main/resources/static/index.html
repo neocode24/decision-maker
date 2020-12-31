@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>로또 자동 생성기</title>
+
+  <!-- Bootstrap Core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+  <link href="vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="css/stylish-portfolio.min.css" rel="stylesheet">
+
+  <style>
+    table.type04 {
+      border-collapse: separate;
+      border-spacing: 1px;
+      text-align: left;
+      line-height: 1.5;
+      border-top: 1px solid #ccc;
+      margin : 10px 5px;
+    }
+    table.type04 th {
+      width: 150px;
+      padding: 10px;
+      font-weight: bold;
+      vertical-align: top;
+      border-bottom: 1px solid #ccc;
+    }
+    table.type04 td {
+      width: 350px;
+      padding: 5px;
+      vertical-align: top;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .filebox label {
+      display: inline-block;
+      padding: .5em .75em;
+      color: #999;
+      font-size: inherit;
+      line-height: normal;
+      vertical-align: middle;
+      background-color: #fdfdfd;
+      cursor: pointer;
+      border: 1px solid #ebebeb;
+      border-bottom-color: #e2e2e2;
+      border-radius: .25em;
+    }
+    .filebox input[type="file"] { /* 파일 필드 숨기기 */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    .filebox input[type="submit"] { /* 파일 필드 숨기기 */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+  </style>
+
+</head>
+
+<body id="page-top">
+
+
+  <!-- Call to Action -->
+  <section class="content-section bg-primary text-white">
+    <div class="container text-center">
+      <h2 class="mb-4">지지리 운 없는 당신을 위한 서비스</h2>
+      <p class="mb-0">구매한 번호가 절대 뽑히지 않는 당신!!</p>
+      <p class="mb-0">로또 QR 이미지를 카메라로 보내면, 구입하지 않은 번호 만으로 자동 생성 해드립니다.</p>
+
+      <div class="filebox">
+        <form method="POST" id="fileUploadForm" onsubmit="return formSubmit(this);">
+          <label for="camera-file" class="btn btn-xl btn-light mr-4">사진찍기</label>
+          <input type="file" id="camera-file" name="file" accept="image/*" capture="camera">
+
+          <label for="btnSubmit" class="btn btn-xl btn-light mr-4">번호 생성</label>
+          <input type="submit" id="btnSubmit" value="생성" class="btn btn-primarybtn btn-xl btn-dark">
+        </form>
+      </div>
+
+
+      <div id="result-div" style="display: none">
+        <br/>
+
+        <h3 class="text-secondary mb-0">당신이 구입한 번호(같은 번호 제외)</h3>
+        <p id="deduplicated-number" class="text-faded mb-0"></p>
+
+        <br/>
+        <h3 class="text-secondary mb-0"><strong>자동 생성 결과</strong></h3>
+        <table id="result" class="type04"></table>
+      </div>
+
+      <div class="container">
+        <p class="text-muted small mb-0">Copyright &copy; neocode24 2020</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded js-scroll-trigger" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for this template -->
+  <script src="js/stylish-portfolio.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+
+      $("#btnSubmit").click(function(event) {
+
+        //stop submit the form, we will post it manually.
+        event.preventDefault();
+
+        // Get form
+        var form = $('#fileUploadForm')[0];
+
+        // Create an FormData object
+        var data = new FormData(form);
+
+        // If you want to add an extra field for the FormData
+        data.append("CustomField", "This is some extra data, testing");
+
+        // result hide
+        $("#result-div").hide();
+
+
+        // disabled the submit button
+        $("#btnSubmit").prop("disabled", true);
+
+        $.ajax({
+          type: "POST",
+          enctype: 'multipart/form-data',
+          url: "/upload",
+          data: data,
+          processData: false,
+          contentType: false,
+          cache: false,
+          timeout: 600000,
+          success: function (data) {
+
+            if (data != null && data.lottoDomains != null) {
+              var resultText = "";
+              for (var i = 0 ; i < data.lottoDomains.length ; i++) {
+                resultText += "<tr>";
+                resultText += "<td><span>" + String.fromCharCode(65 + i) + "자 동" + "</span></td>";
+                resultText += "<td><span>" + data.lottoDomains[i].number1 + "</span></td>";
+                resultText += "<td><span>" + data.lottoDomains[i].number2 + "</span></td>";
+                resultText += "<td><span>" + data.lottoDomains[i].number3 + "</span></td>";
+                resultText += "<td><span>" + data.lottoDomains[i].number4 + "</span></td>";
+                resultText += "<td><span>" + data.lottoDomains[i].number5 + "</span></td>";
+                resultText += "<td><span>" + data.lottoDomains[i].number6 + "</span></td>";
+                resultText += "</tr>";
+              }
+            }
+
+            $("#result").empty();
+            $("#result").append(resultText);
+
+            $("#result-div").fadeIn();
+
+            $("#deduplicated-number").empty();
+            $("#deduplicated-number").append(data.deduplicatedNumbers.join(", "));
+
+            $("#btnSubmit").val("다시 생성");
+
+            console.log("SUCCESS : ", resultText);
+            $("#btnSubmit").prop("disabled", false);
+
+          },
+          error: function (e) {
+
+            $("#result").empty();
+            $("#result").append("<td><td><span>" + e.responseText + "</span></td>");
+
+            $("#result-div").fadeIn();
+
+            console.log("ERROR : ", e);
+            $("#btnSubmit").prop("disabled", false);
+
+          }
+        });
+
+      });
+    });
+  </script>
+
+</body>
+
+</html>

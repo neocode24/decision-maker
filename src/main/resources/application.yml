@@ -1,0 +1,49 @@
+
+spring:
+  data:
+    mongodb:
+      username: userapp
+      password: ENC(d7IgbthQaneNH9mgS44Cd7fOWGiLJXu3)
+      database: lotto-decision-maker
+      port: 27017
+      host: lotto-mongodb
+      socket-keep-alive: true
+      socket-timeout: 2000
+      min-connections-per-host: 10
+      max-connections-per-host: 10
+      max-wait-time: 10000
+      max-connection-idle-time: 0
+      max-connection-life-time: 0
+
+  devtools:
+    livereload:
+      enabled: true
+
+  management:
+    endpoints:
+      loggers:
+        enabled: true
+      web:
+        exposure:
+          include: health,loggers,metrics,prometheus
+
+  servlet:
+    multipart:
+      file-size-threshold: 20MB
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+# health check
+management:
+  endpoints:
+    loggers:
+      enabled: true
+    web:
+      exposure:
+        include: health,loggers,metrics,prometheus
+
+# Logging config
+logging:
+  config: classpath:logback-spring.xml
+server:
+  port: 8080
